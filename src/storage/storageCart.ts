@@ -1,7 +1,7 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { ImageSourcePropType } from 'react-native';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { ImageSourcePropType } from "react-native";
 
-const CART_STORAGE = '@IGNITESHOES_CART';
+const CART_STORAGE = "@IGNITESHOES_CART";
 
 export type StorageCartProps = {
   id: string;
@@ -9,9 +9,9 @@ export type StorageCartProps = {
   size: number;
   quantity: number;
   image: ImageSourcePropType;
-}
+};
 
-export async function storageProductGetAll() {
+export async function getProductsFromStorage() {
   try {
     const storage = await AsyncStorage.getItem(CART_STORAGE);
     const products: StorageCartProps[] = storage ? JSON.parse(storage) : [];
@@ -22,16 +22,19 @@ export async function storageProductGetAll() {
   }
 }
 
-export async function storageProductSave(newProduct: StorageCartProps) {
+export async function saveProductToStorage(newProduct: StorageCartProps) {
   try {
-    let products = await storageProductGetAll();
+    let products = await getProductsFromStorage();
 
-    const productExists = products.filter(product => product.id === newProduct.id);
+    const productExists = products.filter(
+      (product) => product.id === newProduct.id
+    );
 
     if (productExists.length > 0) {
-      products = products.map(product => {
+      products = products.map((product) => {
         if (product.id === newProduct.id) {
-          product.quantity = Number(product.quantity) + Number(newProduct.quantity)
+          product.quantity =
+            Number(product.quantity) + Number(newProduct.quantity);
         }
 
         return product;
@@ -40,8 +43,8 @@ export async function storageProductSave(newProduct: StorageCartProps) {
       products.push(newProduct);
     }
 
-    const productsUpdated = JSON.stringify(products);
-    await AsyncStorage.setItem(CART_STORAGE, productsUpdated);
+    const updatedProductList = JSON.stringify(products);
+    await AsyncStorage.setItem(CART_STORAGE, updatedProductList);
 
     return products;
   } catch (error) {
@@ -49,14 +52,16 @@ export async function storageProductSave(newProduct: StorageCartProps) {
   }
 }
 
-export async function storageProductRemove(productId: string) {
+export async function removeProductFromStorage(productId: string) {
   try {
-    const products = await storageProductGetAll();
+    const products = await getProductsFromStorage();
 
-    const productsUpdated = products.filter(product => product.id !== productId);
-    await AsyncStorage.setItem(CART_STORAGE, JSON.stringify(productsUpdated));
+    const filteredProducts = products.filter(
+      (product) => product.id !== productId
+    );
+    await AsyncStorage.setItem(CART_STORAGE, JSON.stringify(filteredProducts));
 
-    return productsUpdated;
+    return filteredProducts;
   } catch (error) {
     throw error;
   }

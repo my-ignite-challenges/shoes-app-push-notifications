@@ -1,5 +1,6 @@
 import { createContext, useState, ReactNode, useEffect } from "react";
 
+import { updateCartTags } from "../notifications/notificationTags";
 import {
   StorageCartProps,
   saveProductToStorage,
@@ -28,6 +29,7 @@ export function CartContextProvider({ children }: CartContextProviderProps) {
     try {
       const storageResponse = await saveProductToStorage(newProduct);
       setCart(storageResponse);
+      updateCartTags(storageResponse.length.toString());
     } catch (error) {
       throw error;
     }
@@ -37,6 +39,7 @@ export function CartContextProvider({ children }: CartContextProviderProps) {
     try {
       const response = await removeProductFromStorage(productId);
       setCart(response);
+      updateCartTags(response.length.toString());
     } catch (error) {
       throw error;
     }
